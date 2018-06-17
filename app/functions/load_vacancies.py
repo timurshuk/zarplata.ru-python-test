@@ -5,6 +5,7 @@ from nltk.stem.snowball import SnowballStemmer
 from nltk.stem import PorterStemmer
 from ..models import Vacancy, db
 from flask import current_app as app
+from .similar_vacancies import set_tfidf_vectors
 
 
 def make_url(offset):
@@ -62,6 +63,7 @@ def load_vacancies():
             db.session.commit()
 
             offset += app.config["VACANCIES_UPLOAD_STEP"]
+        set_tfidf_vectors()
 
 
 def get_vacancy_by_id(vacancy_id):
