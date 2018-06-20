@@ -23,12 +23,16 @@ def update_vectors_of_vacancies(all_vacancies, npm_tfidf):
 def get_similar_vacancies(check_vacancy):
     all_vacancies = Vacancy.query.filter(Vacancy.vacancy_id != check_vacancy.vacancy_id).all()
     if check_vacancy.vector is not None:
+        # зачем делать split для каждой вакансии из всего сета на каждый запрос
+        # ведь можно сделать один раз при инициализации сервера
         train_set = [[float(x) for x in vacancy.vector.split()] for vacancy in all_vacancies]
         similarity_list = cosine_similarity([[float(x) for x in check_vacancy.vector.split()]], train_set)
         for i, value in enumerate(similarity_list[0].tolist()):
             all_vacancies[i].similarity_index = value
     else:
         train_set = [check_vacancy.words] + [x.words for x in all_vacancies]
+        # лучше такое делать в фоне и чтобы пользователь не ждал
+        # можно делать transform только для проверяемой вакансии
         tfidf_vectorizer = TfidfVectorizer()
         tfidf_matrix_train = tfidf_vectorizer.fit_transform(train_set)
         similarity_list = cosine_similarity(tfidf_matrix_train[0:1], tfidf_matrix_train)

@@ -29,6 +29,7 @@ def get_words_of_vacancy(vacancy):
 
 def get_word_list(text):
     if text:
+        # эти объекты создаются при каждом вызове функции
         ps = PorterStemmer()
         ss = SnowballStemmer("russian")
         pattern = re.compile('<.*?>')
@@ -38,12 +39,14 @@ def get_word_list(text):
         words = [ss.stem(x) for x in words]
 
         return words
+    # else можно убрать
     else:
         return []
 
 
 def load_vacancies():
     count_vacancies = db.session.query(Vacancy).count()
+    # тут можно развернуть условие
     if count_vacancies == 0:
         offset = 0
         while offset < app.config["VACANCIES_NUMBER"]:
@@ -68,6 +71,7 @@ def load_vacancies():
 
 def get_vacancy_by_id(vacancy_id):
     vacancy = Vacancy.query.filter_by(vacancy_id=vacancy_id).first()
+    # тоже можно развернуть условие
     if vacancy is None:
         data = requests.get(app.config["API"] + str(vacancy_id))
         json_data = data.json()
